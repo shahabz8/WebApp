@@ -1,0 +1,58 @@
+pool:
+  name: Hosted Ubuntu 1604
+  demands:
+  - maven
+  - java
+
+#Your build pipeline references an undefined variable named ‘Parameters.mavenPOMFile’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+
+steps:
+- task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
+  displayName: 'Prepare analysis on SonarCloud'
+  inputs:
+    SonarCloud: 'sonar cloud'
+    organization: 'zaman-shahab30847'
+    scannerMode: Other
+
+- task: Maven@3
+  displayName: 'Maven pom.xml'
+  inputs:
+    mavenPomFile: '$(Parameters.mavenPOMFile)'
+    publishJUnitResults: false
+    sonarQubeRunAnalysis: true
+    sqMavenPluginVersionChoice: pom
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+  inputs:
+    SourceFolder: '$(system.defaultworkingdirectory)'
+    Contents: '**/*.war'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+  condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: deployment.yml
+  condition: succeededOrFailed()
+
+- task: Docker@2
+  displayName: buildAndPush
+  inputs:
+    containerRegistry: uniper
+    repository: sandy3004/uniper
+
+- task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
+  displayName: 'Run Code Analysis'
+
+- task: SonarSource.sonarcloud.38b27399-a642-40af-bb7d-9971f69712e8.SonarCloudPublish@1
+  displayName: 'Publish Quality Gate Result'
+
+- task: Kubernetes@1
+  displayName: 'kubectl apply'
+  inputs:
+    kubernetesServiceEndpoint: Uniper
+    command: apply
+    useConfigurationFile: true
+    configuration: deployment.yml
+
