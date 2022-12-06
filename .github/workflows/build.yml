@@ -6,7 +6,7 @@ on:
   push:
   # and the target with some regex to match our specific  branch names
     branches:
-      - 'sonar-shahab'
+      - 'sonar'
   pull_request:
     types: [opened, synchronize, reopened]
       
