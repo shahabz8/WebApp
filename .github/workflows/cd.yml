@@ -5,6 +5,7 @@ on:
     workflows: ["CI Java"]
     types:
       - completed
+    artifacts: true
 
 permissions:
   actions: read
