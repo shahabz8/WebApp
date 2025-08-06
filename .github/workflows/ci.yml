@@ -5,6 +5,10 @@ on:
     branches:
       - shahab
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
