@@ -25,6 +25,8 @@ jobs:
           workflow_conclusion: success
           name: java-app
           path: ./artifact
+          repo: ${{ github.repository }}
+          run_id: ${{ github.event.workflow_run.id }}
 
       - name: Deploy (simulated)
         run: |
