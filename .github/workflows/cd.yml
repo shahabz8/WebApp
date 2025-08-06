@@ -1,0 +1,26 @@
+name: CD Java
+
+on:
+  workflow_run:
+    workflows: ["CI Java"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: java-app
+          path: ./artifact
+
+      - name: Deploy (simulated)
+        run: |
+          echo "Deploying Java artifact..."
+          ls ./artifact
+          # Simulate deployment
+          # java -jar ./artifact/your-app.jar
