@@ -1,4 +1,4 @@
-name: Build and Upload Java Artifact
+name: CI Java
 
 on:
   push:
